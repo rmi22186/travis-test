@@ -251,7 +251,7 @@
             // if Identity object exists on mParticle, it is on V2 of SDK and we prioritize MPID
             if (window.mParticle && window.mParticle.Identity) {
                 if (forwarderSettings.userIdField === constants.mpid) {
-                    user = window.mParticle.getCurrentUser();
+                    user = window.mParticle.Identity.getCurrentUser();
                     if (user) {
                         userId = user.getMPID();
                         Leanplum.start(userId);
