@@ -1,3 +1,10 @@
+/*
+The below is an example SDK integration using integration-builder.js and is
+intended to be used as a guide to create your own integration. A real world
+example can be viewed at https://www.github.com/mparticle-integrations....
+*/
+
+
 var mParticleIntegration = {
     name: 'clientSDK',
     initForwarder: function(forwarderSettings, testMode, userAttributes, userIdentities, processEvent, eventQueue) {
@@ -60,6 +67,16 @@ var mParticleIntegration = {
     },
     removeUserAttribute: function(key) {
         this.setUserAttribute(key, null);
+    },
+    onUserIdentified: function(mParticleUser, forwarderSettings) {
+        // mParticleUser.getUserIdentities(); --> {userIdentities: {customerid: 'abc', email: 'email@gmail.com'}}
+        var userIdentities = mParticle.getUserIdentities().userIdentities;
+        for (var userIdType in userIdentities) {
+            if (userIdType === 'customerid') {
+                var userId = userIdentities[userIdType];
+                ClientSDK.setUserIdentity(userId, userIdType);
+            }
+        }
     }
 };
 
