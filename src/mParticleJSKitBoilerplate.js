@@ -14,10 +14,15 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-var integrationBuilder = require('../integration-builder');
+var CommerceHandler = require('../integration-builder/commerce-handler');
+var EventHandler = require('../integration-builder/event-handler');
+var IdentityHandler = require('../integration-builder/identity-handler');
+var Initialization = require('../integration-builder/initialization');
+var SessionHandler = require('../integration-builder/session-handler');
+var UserAttributeHandler = require('../integration-builder/user-attribute-handler');
 
 (function (window) {
-    var name = integrationBuilder.name,
+    var name = Initialization.name,
         MessageType = {
             SessionStart: 1,
             SessionEnd: 2,
@@ -35,14 +40,14 @@ var integrationBuilder = require('../integration-builder');
             reportingService,
             eventQueue = [];
 
-        self.name = integrationBuilder.name;
+        self.name = Initialization.name;
 
         function initForwarder(settings, service, testMode, trackerId, userAttributes, userIdentities) {
             forwarderSettings = settings;
             reportingService = service;
 
             try {
-                integrationBuilder.initForwarder(settings, testMode, userAttributes, userIdentities, processEvent, eventQueue);
+                Initialization.initForwarder(settings, testMode, userAttributes, userIdentities, processEvent, eventQueue);
                 isInitialized = true;
             } catch (e) {
                 console.log('Failed to initialize ' + name + ' - ' + e);
@@ -53,11 +58,17 @@ var integrationBuilder = require('../integration-builder');
             var reportEvent = false;
             if (isInitialized) {
                 try {
-                    if (event.EventDataType === MessageType.PageView) {
+                    if (event.EventDataType === MessageType.SessionStart) {
+                        reportEvent = logSessionStart(event);
+                    } else if (event.EventDataType === MessageType.SessionEnd) {
+                        reportEvent = logSessionEnd(event);
+                    } else if (event.EventDataType === MessageType.CrashReport) {
+                        reportEvent = logError(event);
+                    } else if (event.EventDataType === MessageType.PageView) {
                         reportEvent = logPageView(event);
                     }
                     else if (event.EventDataType === MessageType.Commerce && event.EventCategory === mParticle.CommerceEventType.ProductPurchase) {
-                        reportEvent = logPurchaseEvent(event);
+                        reportEvent = logEcommerceEvent(event);
                     }
                     else if (event.EventDataType === MessageType.Commerce) {
                         var listOfPageEvents = mParticle.eCommerce.expandCommerceEvent(event);
@@ -92,9 +103,36 @@ var integrationBuilder = require('../integration-builder');
             }
         }
 
+        function logSessionStart(event) {
+            try {
+                SessionHandler.onSessionStart(event);
+                return true;
+            } catch (e) {
+                return {error: 'Error starting session on forwarder ' + name + '; ' + e};
+            }
+        }
+
+        function logSessionEnd(event) {
+            try {
+                SessionHandler.onSessionEnd(event);
+                return true;
+            } catch (e) {
+                return {error: 'Error ending session on forwarder ' + name + '; ' + e};
+            }
+        }
+
+        function logError(event) {
+            try {
+                EventHandler.logError(event);
+                return true;
+            } catch (e) {
+                return {error: 'Error logging error on forwarder ' + name + '; ' + e};
+            }
+        }
+
         function logPageView(event) {
             try {
-                integrationBuilder.logPageView(event);
+                EventHandler.logPagView(event);
                 return true;
             } catch (e) {
                 return {error: 'Error logging page view on forwarder ' + name + '; ' + e};
@@ -103,16 +141,16 @@ var integrationBuilder = require('../integration-builder');
 
         function logEvent(event) {
             try {
-                integrationBuilder.logEvent(event);
+                EventHandler.logEvent(event);
                 return true;
             } catch (e) {
                 return {error: 'Error logging event on forwarder ' + name + '; ' + e};
             }
         }
 
-        function logPurchaseEvent(event) {
+        function logEcommerceEvent(event) {
             try {
-                integrationBuilder.logPurchaseEvent(event);
+                CommerceHandler.logEvent(event);
                 return true;
             } catch (e) {
                 return {error: 'Error logging purchase event on forwarder ' + name + '; ' + e};
@@ -122,7 +160,7 @@ var integrationBuilder = require('../integration-builder');
         function setUserAttribute(key, value) {
             if (isInitialized) {
                 try {
-                    integrationBuilder.setUserAttribute(key, value, forwarderSettings);
+                    UserAttributeHandler.setUserAttribute(key, value, forwarderSettings);
                     return 'Successfully set user attribute on forwarder ' + name;
                 } catch (e) {
                     return 'Error setting user attribute on forwarder ' + name + '; ' + e;
@@ -135,7 +173,7 @@ var integrationBuilder = require('../integration-builder');
         function removeUserAttribute(key) {
             if (isInitialized) {
                 try {
-                    integrationBuilder.removeUserAttribute(key, forwarderSettings);
+                    UserAttributeHandler.removeUserAttribute(key, forwarderSettings);
                     return 'Successfully removed user attribute on forwarder ' + name;
                 } catch (e) {
                     return 'Error removing user attribute on forwarder ' + name + '; ' + e;
@@ -145,13 +183,24 @@ var integrationBuilder = require('../integration-builder');
             }
         }
 
-        function onUserIdentified(user) {
+        function onUserIdentified(user, method) {
+            var identityMapping = {
+                modify: 'onModifyCompleted',
+                identify: 'onIdentifyCompleted',
+                login: 'onLoginCompleted',
+                logout: 'onLogoutCompleted'
+            };
             if (isInitialized) {
                 try {
-                    integrationBuilder.onUserIdentified(user, forwarderSettings);
+                    if (method) {
+                        IdentityHandler[identityMapping[method]](user, forwarderSettings);
+                    } else {
+                        IdentityHandler.onUserIdentified(user, forwarderSettings);
+                    }
+
                     return 'Successfully set user Identity on forwarder ' + name;
                 } catch (e) {
-                    return {error: 'Error calling onUserIdentified on forwarder ' + name + '; ' + e};
+                    return {error: 'Error setting user identity on forwarder ' + name + '; ' + e};
                 }
             }
             else {
