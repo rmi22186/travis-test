@@ -7,32 +7,14 @@ Call mParticleUser.getMPID() to get mParticle ID
 For any additional methods, see http://docs.mparticle.com/developers/sdk/javascript/apidocs/classes/mParticle.Identity.getCurrentUser().html
 */
 
-
-/*
-identityApiRequest has the schema:
-{
-  userIdentities: {
-    customerId: '123',
-    email: 'abc'
-  }
-}
-For more userIdentity types, see http://docs.mparticle.com/developers/sdk/javascript/identity#allowed-identity-types
-*/
-
 var identityHandler = {
-    onIdentifyCompleted: function(mParticleUser, identityApiRequest) {
+    onRemoveUserAttribute: function(key, mParticleUser) {
 
     },
-    onLoginCompleted: function(mParticleUser, identityApiRequest) {
+    onSetUserAttribute: function(key, value, mParticleUser) {
 
     },
-    onLogoutCompleted: function(mParticleUser, identityApiRequest) {
-
-    },
-    onModifyCompleted: function(mParticleUser, identityApiRequest) {
-
-    },
-    onUserIdentified: function(mParticleUser, identityApiRequest, forwarderSettings) {
+    onConsentStateUpdated: function(oldState, newState, mParticleUser) {
 
     }
 };

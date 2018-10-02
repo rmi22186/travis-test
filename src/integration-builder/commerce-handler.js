@@ -8,7 +8,7 @@ var commerceHandler = {
             EventAttributes: { key1: 'value1', key2: 'value2' },
             EventType: 16,
             EventCategory: 10, // (This is an add product to cart event, see below for additional ecommerce EventCategories)
-            EventName: "eCommerce - Purchase",
+            EventName: "eCommerce - AddToCart",
             MPID: "8278431810143183490",
             ProductAction: {
                 Affiliation: 'aff1',
