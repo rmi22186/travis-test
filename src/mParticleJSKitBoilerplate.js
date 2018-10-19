@@ -14,12 +14,12 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-var CommerceHandler = require('./integration-builder-example/commerce-handler');
-var EventHandler = require('./integration-builder-example/event-handler');
-var IdentityHandler = require('./integration-builder-example/identity-handler');
-var Initialization = require('./integration-builder-example/initialization');
-var SessionHandler = require('./integration-builder-example/session-handler');
-var UserAttributeHandler = require('./integration-builder-example/user-attribute-handler');
+var CommerceHandler = require('./integration-builder/commerce-handler');
+var EventHandler = require('./integration-builder/event-handler');
+var IdentityHandler = require('./integration-builder/identity-handler');
+var Initialization = require('./integration-builder/initialization');
+var SessionHandler = require('./integration-builder/session-handler');
+var UserAttributeHandler = require('./integration-builder/user-attribute-handler');
 
 (function (window) {
     var name = Initialization.name,
