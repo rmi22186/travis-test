@@ -8,6 +8,7 @@
   "devDependencies": {
     "should": "^7.1.0",
     "mocha": "^2.3.2",
-    "watchify": "^3.9.0"
+    "watchify": "^3.9.0",
+    "mparticle-javascript-web-kit-wrapper-": "^1.0.0"
   }
 }
