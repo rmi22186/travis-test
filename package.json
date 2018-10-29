@@ -3,7 +3,7 @@
   "version": "",
   "scripts": {
     "testKarma": "node test/boilerplate/test-karma.js",
-    "watch": "watchify src/mParticleJSKitBoilerplate.js -v -o build/$KIT-Kit.js --debug"
+    "watch": "watchify ./node_modules/mparticle-javascript-web-kit-wrapper/index.js -v -o build/$KIT-Kit.js --debug"
   },
   "devDependencies": {
     "should": "^7.1.0",
