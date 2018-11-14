@@ -12,7 +12,7 @@ For any additional methods, see http://docs.mparticle.com/developers/sdk/javascr
 identityApiRequest has the schema:
 {
   userIdentities: {
-    customerId: '123',
+    customerid: '123',
     email: 'abc'
   }
 }
