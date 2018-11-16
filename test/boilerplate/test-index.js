@@ -22,5 +22,5 @@ function currentUser() {
 }
 
 window.mParticle = new mp();
-require('../../src/mParticleJSKitBoilerplate.js');
+require('../../node_modules/@mparticle/web-kit-wrapper/index.js');
 require('../tests.js');
